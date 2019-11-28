@@ -26,7 +26,7 @@ public class ServerListener implements Runnable {
             this.loginMessage(this.bufferedReader.readLine());
 
             //Send init message
-            this.initMessage(this.bufferedReader.readLine());
+            new Thread(new InitMessageSender(this.bufferedOutputStream)).start();
 
             while (true) {
                 String command = this.bufferedReader.readLine();
@@ -49,11 +49,6 @@ public class ServerListener implements Runnable {
         if (commandType.equals("command")) {
             new RunCommand((String) (new JSONObject(command)).get("command"));
         }
-    }
-
-    private void initMessage(String bufferedReader) throws IOException {
-        InitMessageSender initMessage = new InitMessageSender();
-        Send.message(this.bufferedOutputStream, initMessage.init());
     }
 
     private void loginMessage(String bufferedReader) throws IOException {

@@ -5,11 +5,12 @@ import com.topin.actions.BiosVersion;
 import com.topin.actions.PowerShell;
 import com.topin.actions.StaticCommand;
 import com.topin.model.command.InitMessage;
-import com.topin.model.command.LoginMessage;
 import com.topin.model.command.help.DriveUsageMessage;
+import com.topin.socket.Send;
 import com.topin.utils.SystemInfo;
 import org.apache.commons.io.FileUtils;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -19,20 +20,56 @@ import java.util.List;
 
 import static com.topin.utils.SystemInfo.getProcessCpuLoad;
 
-public class InitMessageSender {
+public class InitMessageSender implements Runnable {
     InitMessage initMessage;
+    private BufferedOutputStream bufferedOutputStream;
 
     public InitMessageSender() {
         this.initMessage = null;
     }
 
-    public InitMessage init() throws IOException {
-        String backgroundImage = RunCommand.execCmd(new PowerShell(new BackgroundImage().toString()).toString());
-        String biosVersion = RunCommand.execCmd(new StaticCommand(new BiosVersion().toString()).toString()).split("[\\r\\n]+")[1];
-        String driverMessage = driverUsageMessage();
-        String taskList = taskList();
+    public InitMessageSender(BufferedOutputStream bufferedOutputStream) {
+        this.bufferedOutputStream = bufferedOutputStream;
+    }
 
-        byte[] fileContent = FileUtils.readFileToByteArray(new File(backgroundImage.trim()));
+    private String taskList() {
+        return String.valueOf(new TaskListListener().run());
+    }
+
+    public String driverUsageMessage() {
+        List<String> driveUsageMessages = new ArrayList<>();
+
+        File[] drives = File.listRoots();
+        if (drives != null && drives.length > 0) {
+            for (File aDrive : drives) {
+                System.out.println(aDrive.getName());
+                Long used = aDrive.getTotalSpace()-aDrive.getFreeSpace();
+                driveUsageMessages.add(new DriveUsageMessage(aDrive,used,aDrive.getTotalSpace()).toJson());
+            }
+        }
+
+        return String.valueOf(driveUsageMessages);
+    }
+
+    @Override
+    public void run() {
+        String backgroundImage = null;
+        String biosVersion = null;
+        try {
+            backgroundImage = RunCommand.execCmd(new PowerShell(new BackgroundImage().toString()).toString());
+            biosVersion = RunCommand.execCmd(new StaticCommand(new BiosVersion().toString()).toString()).split("[\\r\\n]+")[1];
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String driverMessage = driverUsageMessage();
+
+        byte[] fileContent = new byte[0];
+        try {
+            fileContent = FileUtils.readFileToByteArray(new File(backgroundImage.trim()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         String encodedString = Base64.getEncoder().encodeToString(fileContent);
 
         SystemInfo systemInfo = new SystemInfo();
@@ -56,25 +93,11 @@ public class InitMessageSender {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return this.initMessage;
-    }
 
-    private String taskList() {
-        return String.valueOf(new TaskListListener().run());
-    }
-
-    public String driverUsageMessage() {
-        List<String> driveUsageMessages = new ArrayList<>();
-
-        File[] drives = File.listRoots();
-        if (drives != null && drives.length > 0) {
-            for (File aDrive : drives) {
-                System.out.println(aDrive.getName());
-                Long used = aDrive.getTotalSpace()-aDrive.getFreeSpace();
-                driveUsageMessages.add(new DriveUsageMessage(aDrive,used,aDrive.getTotalSpace()).toJson());
-            }
+        try {
+            Send.message(this.bufferedOutputStream, this.initMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        return String.valueOf(driveUsageMessages);
     }
 }
