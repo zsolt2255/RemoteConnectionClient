@@ -1,11 +1,15 @@
 package com.topin.services;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 public class RunCommand {
+    Process process;
+    //TODO itt initeljük majd a commandot constructba és azzal dolguzunk
 
     public RunCommand(String command) throws IOException {
-        execCmd(command);
+        this.process = Runtime.getRuntime().exec(command);
     }
 
     public static String execCmd(String cmd) throws java.io.IOException {

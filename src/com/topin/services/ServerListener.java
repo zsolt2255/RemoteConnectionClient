@@ -1,5 +1,6 @@
 package com.topin.services;
 
+import com.topin.actions.*;
 import com.topin.model.command.InitMessage;
 import com.topin.model.command.LoginMessage;
 import com.topin.socket.Send;
@@ -7,6 +8,7 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class ServerListener implements Runnable {
     private Socket socket;
@@ -52,8 +54,15 @@ public class ServerListener implements Runnable {
     }
 
     private void initMessage(String bufferedReader) throws IOException {
-        InitMessage initMessage = new InitMessage("asd", "asd",
-                "asd", "asd", "asd", "asd", 1234.2, 1234, 1234, "asd",
+        Double cpuUsage = Double.valueOf(RunCommand.execCmd(new StaticCommand(new CPUInformation().toString()).toString()).split("[\\r\\n]+")[1]);
+        String hostName = RunCommand.execCmd(new StaticCommand(new HostName().toString()).toString()).split("[\\r\\n]+")[0];
+        String[] osName = RunCommand.execCmd(new StaticCommand(new OperationInformation().toString()).toString()).split(":")[1].split("\\r?\\n");
+        String[] osVersion = RunCommand.execCmd(new StaticCommand(new OperationInformation().toString()).toString()).split(":");
+        String biosVersion = RunCommand.execCmd(new StaticCommand(new BiosVersion().toString()).toString()).split("[\\r\\n]+")[1];
+        String ramMaxString = RunCommand.execCmd(new StaticCommand(new RamMax().toString()).toString()).split(":")[1];
+        Integer ramMax = Integer.valueOf(ramMaxString.trim().substring(0, ramMaxString.trim().length() - 2));
+        InitMessage initMessage = new InitMessage(hostName, "asd",
+                "asd", osName[0].trim(), osVersion[2].trim(), biosVersion.trim(), cpuUsage, ramMax, 1234, "asd",
                 "asd");
         Send.message(this.bufferedOutputStream, initMessage);
     }

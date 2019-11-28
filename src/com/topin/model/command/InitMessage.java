@@ -32,12 +32,11 @@ public class InitMessage extends Message {
         this.taskList = taskList;
     }
 
-
     @Override
     public String toJson() {
         return new JSONObject()
                 .put("type", "init")
-                .put("success", this.hostname)
+                .put("hostname", this.hostname)
                 .put("cpuName", this.cpuName)
                 .put("localIp", this.localIp)
                 .put("osName", this.osName)
