@@ -28,6 +28,7 @@ public class Main {
                     Integer.parseInt(SocketProperties.INSTANCE.getSocketPort())),5000);
             System.out.println("Connect successfully to server: " + socket.toString());
 
+            //Start ServerConnection
             new Thread(new ServerConnection(socket)).start();
         } catch (Exception e) {
             try {

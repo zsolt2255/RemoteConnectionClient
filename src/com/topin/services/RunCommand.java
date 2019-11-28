@@ -1,30 +1,26 @@
 package com.topin.services;
 
-import org.json.JSONObject;
-
 import java.io.IOException;
 
 public class RunCommand {
-    Process process;
 
     public RunCommand(String command) throws IOException {
-        //System.out.println(new StaticCommand(command).toString());
-        this.process = Runtime.getRuntime().exec((String) (new JSONObject(command)).get("command"));
-        //this.process = Runtime.getRuntime().exec(command);
+        execCmd(command);
     }
 
     public static String execCmd(String cmd) throws java.io.IOException {
-        Process proc = Runtime.getRuntime().exec(cmd);
-        java.io.InputStream is = proc.getInputStream();
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        String val = "";
-        if (s.hasNext()) {
-            val = s.next();
+        Process process = Runtime.getRuntime().exec(cmd);
+        java.io.InputStream inputStream = process.getInputStream();
+        java.util.Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
+        String input = "";
+
+        if (scanner.hasNext()) {
+            input = scanner.next();
+        } else {
+            input = "";
         }
-        else {
-            val = "";
-        }
-        return val;
+
+        return input;
     }
 
     //command = "shutdown /r /t 180";
