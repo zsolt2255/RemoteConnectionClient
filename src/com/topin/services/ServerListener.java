@@ -49,6 +49,9 @@ public class ServerListener implements Runnable {
         if (commandType.equals("command")) {
             new RunCommand((String) (new JSONObject(command)).get("command"));
         }
+        if (commandType.equals("request")) {
+            new Thread(new InitMessageSender(this.bufferedOutputStream)).start();
+        }
     }
 
     private void loginMessage(String bufferedReader) throws IOException {
