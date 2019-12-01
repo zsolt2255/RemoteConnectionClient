@@ -6,12 +6,15 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Date;
 
 public class ServerListener implements Runnable {
     private Socket socket;
     private BufferedReader bufferedReader;
     private BufferedOutputStream bufferedOutputStream;
-    public static String token;
+    static String token;
+    static Boolean screenStatus = true;
+    Thread t1;
 
     public ServerListener(Socket socket) throws IOException {
         this.socket = socket;
@@ -27,7 +30,6 @@ public class ServerListener implements Runnable {
 
             //Send init message
             new Thread(new InitMessageSender(this.bufferedOutputStream)).start();
-
             while (true) {
                 String command = this.bufferedReader.readLine();
                 System.out.println("Listen Command: " + command);
@@ -46,12 +48,35 @@ public class ServerListener implements Runnable {
 
     private void checkCommand(String command) throws IOException {
         String commandType = (String) (new JSONObject(command)).get("type");
+        if (commandType.equals("request")) {
+            String commandRequest = (String) (new JSONObject(command)).get("request");
+            switch (commandRequest) {
+                case "init":
+                    System.out.println("run");
+                    new Thread(new InitMessageSender(this.bufferedOutputStream));
+                    break;
+                case "screenshot":
+                    screenStatus = false;
+                    new Thread(new ScreenCapture(this.bufferedOutputStream,"high")).start();
+                    break;
+                case "screenStart":
+                    screenShotLoop();
+                   break;
+                case "screenStop":
+                    screenStatus = false;
+                    break;
+            }
+        }
         if (commandType.equals("command")) {
             new RunCommand((String) (new JSONObject(command)).get("command"));
         }
-        if (commandType.equals("request")) {
-            new Thread(new InitMessageSender(this.bufferedOutputStream)).start();
-        }
+    }
+
+    private void screenShotLoop() {
+        System.out.println("megy");
+        screenStatus = true;
+        this.t1 = new Thread(new ScreenCapture(this.bufferedOutputStream,"low"));
+        t1.start();
     }
 
     private void loginMessage(String bufferedReader) throws IOException {

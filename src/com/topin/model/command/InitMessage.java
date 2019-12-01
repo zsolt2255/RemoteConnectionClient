@@ -13,8 +13,8 @@ public class InitMessage extends Message {
     private String osVersion;
     private String biosVersion;
     private Double cpuUsage;
-    private Long ramUsage;
-    private Long ramMax;
+    private String ramUsage;
+    private String ramMax;
     private String driveUsage; // Json: C: 11GB/256GB  USED/ALL
     private String backgroundImage;
     private String target = "1";
@@ -22,7 +22,7 @@ public class InitMessage extends Message {
 
     private String taskList; // JSON: {count: 121, [{name: 'Total Commander', status: 'idle', 'pid': 12331}]}
 
-    public InitMessage(String hostname, String cpuName, String localIp, String osName, String osVersion, String biosVersion, Double cpuUsage, Long ramMax, Long ramUsage, String driveUsage, String taskList, String backgroundImage, String from) {
+    public InitMessage(String hostname, String cpuName, String localIp, String osName, String osVersion, String biosVersion, Double cpuUsage, String ramMax, String ramUsage, String driveUsage, String taskList, String backgroundImage, String from) {
         super("init");
         this.hostname = hostname;
         this.cpuName = cpuName;

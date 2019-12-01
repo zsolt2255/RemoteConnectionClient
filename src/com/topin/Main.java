@@ -9,7 +9,7 @@ import com.topin.utils.SocketProperties;
 public class Main {
     private static Socket socket = null;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.out.println("Starting client...");
 
         new Main().init();
@@ -36,6 +36,8 @@ public class Main {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+
+            System.out.println( Thread.activeCount());
             System.out.println("Trying reconnect...");
         }
     }

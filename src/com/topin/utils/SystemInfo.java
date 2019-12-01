@@ -40,12 +40,13 @@ public class SystemInfo {
         return ((int)(value * 1000) / 10.0);
     }
 
-    public Long getMemoryMax() {
-        return ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize();
+    public String getMemoryMax() {
+        return String.valueOf(((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize());
     }
 
-    public Long getMemoryUsed() {
-        return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+    public String getMemoryUsed() {
+        return String.valueOf(((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize() -
+                ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getFreePhysicalMemorySize());
     }
 
     public String getHostAddress() throws UnknownHostException {

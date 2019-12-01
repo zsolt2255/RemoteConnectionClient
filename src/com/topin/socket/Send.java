@@ -1,5 +1,7 @@
 package com.topin.socket;
 
+import com.topin.model.Message;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,13 +17,19 @@ public class Send {
     }
 
     private static String getString(BufferedOutputStream bufferedOutputStream, Object command, String input) throws IOException {
-        byte[] cmd = (input).getBytes();
-        bufferedOutputStream.write(cmd, 0, cmd.length);
-        bufferedOutputStream.flush();
+        try {
+            byte[] cmd = (input).getBytes();
+            bufferedOutputStream.write(cmd, 0, cmd.length);
+            bufferedOutputStream.flush();
 
-        System.out.println("Run Command: "+command);
+            System.out.println("Run Command: " + command);
 
-        return Arrays.toString(cmd);
+            return Arrays.toString(cmd);
+        } catch(Exception e) {
+            bufferedOutputStream.close();
+        }
+
+        return null;
     }
 
     public static String message(BufferedOutputStream bufferedOutputStream, Object command) throws IOException {

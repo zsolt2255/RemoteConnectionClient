@@ -15,7 +15,7 @@ public class TaskListListener{
 
     public TaskListListener() {
         this.process = null;
-        this.taskLists.add(0, "count");
+        //this.taskLists.add(0, "count");
     }
 
     public List<String> run() {
@@ -44,7 +44,7 @@ public class TaskListListener{
         }
         try {
             process.waitFor();
-            taskLists.set(0,"count:"+count);
+            //taskLists.set(0,"count:"+count);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

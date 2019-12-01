@@ -14,9 +14,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.net.SocketException;
+import java.util.*;
 
 import static com.topin.utils.SystemInfo.getProcessCpuLoad;
 
@@ -65,22 +64,26 @@ public class InitMessageSender implements Runnable {
         String driverMessage = driverUsageMessage();
 
         byte[] fileContent = new byte[0];
+
         try {
-            fileContent = FileUtils.readFileToByteArray(new File(backgroundImage.trim()));
+            fileContent = FileUtils.readFileToByteArray(new File(Objects.requireNonNull(backgroundImage).trim()));
         } catch (IOException e) {
             e.printStackTrace();
         }
         String encodedString = Base64.getEncoder().encodeToString(fileContent);
 
+        String biosVersionTrim = Objects.requireNonNull(biosVersion).trim();
+
         SystemInfo systemInfo = new SystemInfo();
         try {
             this.initMessage = new InitMessage(
                     InetAddress.getLocalHost().getHostName(),
+                    //String.valueOf(new Random().nextInt()),
                     System.getenv("PROCESSOR_ARCHITECTURE"),
                     systemInfo.getHostAddress(),
                     System.getProperty("os.name"),
                     System.getProperty("os.version"),
-                    biosVersion.trim(),
+                    biosVersionTrim,
                     getProcessCpuLoad(),
                     systemInfo.getMemoryMax(),
                     systemInfo.getMemoryUsed(),
