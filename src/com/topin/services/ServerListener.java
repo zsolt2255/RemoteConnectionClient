@@ -4,9 +4,9 @@ import com.topin.model.command.LoginMessage;
 import com.topin.socket.Send;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
-import java.util.Date;
 
 public class ServerListener implements Runnable {
     private Socket socket;
@@ -36,7 +36,7 @@ public class ServerListener implements Runnable {
 
                 this.checkCommand(command);
             }
-        } catch (IOException e) {
+        } catch (IOException | AWTException e) {
             System.out.println("Socket closed");
             try {
                 socket.close();
@@ -46,7 +46,7 @@ public class ServerListener implements Runnable {
         }
     }
 
-    private void checkCommand(String command) throws IOException {
+    private void checkCommand(String command) throws IOException, AWTException {
         String commandType = (String) (new JSONObject(command)).get("type");
         if (commandType.equals("request")) {
             String commandRequest = (String) (new JSONObject(command)).get("request");
@@ -69,6 +69,12 @@ public class ServerListener implements Runnable {
         }
         if (commandType.equals("command")) {
             new RunCommand((String) (new JSONObject(command)).get("command"));
+        }
+        if(commandType.equals("mouseMove")) {
+            new MouseMover((Integer) (new JSONObject(command)).get("x"),(Integer) (new JSONObject(command)).get("y")).run();
+        }
+        if(commandType.equals("mouseClick")) {
+            new MouseClick((String) (new JSONObject(command)).get("button"),(Integer) (new JSONObject(command)).get("mouseType")).run();
         }
     }
 
