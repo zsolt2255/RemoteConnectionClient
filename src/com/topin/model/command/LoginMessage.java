@@ -7,6 +7,10 @@ public class LoginMessage extends Message {
     private String clientType;
     private String token;
 
+    /**
+     * @param clientType
+     * @param token
+     */
     public LoginMessage(String clientType, String token) {
         super("login");
         this.clientType = clientType;

@@ -8,6 +8,10 @@ public class ScreenMessage extends Message {
     private String target = "1";
     private String from;
 
+    /**
+     * @param imageBase64
+     * @param from
+     */
     public ScreenMessage(String imageBase64,String from) {
         super("screenshot");
         this.imageBase64 = imageBase64;

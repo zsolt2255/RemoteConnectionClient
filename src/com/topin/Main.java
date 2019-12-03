@@ -3,18 +3,26 @@ package com.topin;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import com.topin.helpers.Log;
 import com.topin.services.ServerConnection;
+import com.topin.socket.Ping;
 import com.topin.utils.SocketProperties;
 
 public class Main {
     private static Socket socket = null;
 
-    public static void main(String[] args) throws IOException {
-        System.out.println("Starting client...");
+    public static void main(String[] args) {
+        //Log initialize
+        Log.configure();
 
+        Log.write("Main").info("Started server....");
+
+        //Started server
         new Main().init();
 
         do {
+            //If socket closed then init loop
             if (socket == null || socket.isClosed()) {
                 new Main().init();
             }
@@ -24,12 +32,18 @@ public class Main {
     private void init() {
         try {
             socket = new Socket();
-            socket.connect(new InetSocketAddress(SocketProperties.INSTANCE.getSocketAddress(),
-                    Integer.parseInt(SocketProperties.INSTANCE.getSocketPort())),5000);
-            System.out.println("Connect successfully to server: " + socket.toString());
+            socket.connect(
+                    new InetSocketAddress(SocketProperties.INSTANCE.getSocketAddress(),
+                    SocketProperties.INSTANCE.getSocketPort()),
+                    SocketProperties.INSTANCE.getSocketTimeout());
 
-            //Start ServerConnection
+            Log.write("Main").info("Connect successfully to server: "+ socket.toString());
+
+            //Start ServerConnection on new thread
             new Thread(new ServerConnection(socket)).start();
+
+            //Start Ping on new thread
+            new Thread(new Ping(socket)).start();
         } catch (Exception e) {
             try {
                 socket.close();
@@ -37,8 +51,8 @@ public class Main {
                 e1.printStackTrace();
             }
 
-            System.out.println( Thread.activeCount());
-            System.out.println("Trying reconnect...");
+            Log.write("Main").info("Trying reconnect...");
+            Log.write("Main").info("Active threads count: "+String.valueOf(Thread.activeCount()));
         }
     }
 }

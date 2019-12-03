@@ -1,17 +1,25 @@
 package com.topin.services;
 
-import org.json.JSONObject;
+import com.topin.helpers.Log;
 
 import java.io.IOException;
 
-public class RunCommand {
-    Process process;
-    //TODO itt initeljük majd a commandot constructba és azzal dolguzunk
+public class RunCommand implements Runnable{
+    private String command = null;
+    private Process process;
 
-    public RunCommand(String command) throws IOException {
-        this.process = Runtime.getRuntime().exec(command);
+    /**
+     * @param command
+     */
+    public RunCommand(String command) {
+        this.command = command;
     }
 
+    /**
+     * @param cmd
+     * @return String
+     * @throws java.io.IOException
+     */
     public static String execCmd(String cmd) throws java.io.IOException {
         Process process = Runtime.getRuntime().exec(cmd);
         java.io.InputStream inputStream = process.getInputStream();
@@ -27,13 +35,14 @@ public class RunCommand {
         return input;
     }
 
-    //command = "shutdown /r /t 180";
-    //command = "cmd.exe /c powershell (New-Object -ComObject Wscript.Shell).Popup(\"\"\"geci jó vagyok\"\"\",0,\"\"\"Feri a hegyrő\"\"\",0x0)";
-
-    /*public String output() throws InterruptedException {
-        StringWriter output = new StringWriter();
-        StreamGobbler streamGobbler = new StreamGobbler(this.process.getInputStream(), output);
-        Executors.newSingleThreadExecutor().submit(streamGobbler);
-        int exitCode = this.process.waitFor();
-    }*/
+    @Override
+    public void run() {
+        try {
+            this.process = Runtime.getRuntime().exec(this.command);
+            Log.write(this).info("Exec command: "+this.command);
+        } catch (IOException e) {
+            Log.write(this).error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

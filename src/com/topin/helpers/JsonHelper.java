@@ -6,12 +6,17 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class JsonHelper {
+    /**
+     * @param jsonObject
+     * @return
+     */
     public static HashMap jsonObjectToHashMap(JSONObject jsonObject) {
         try {
             return new ObjectMapper().readValue(jsonObject.toString(), HashMap.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 }

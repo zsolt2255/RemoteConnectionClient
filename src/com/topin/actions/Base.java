@@ -1,5 +1,8 @@
 package com.topin.actions;
 
-abstract public class Base {
-    public String prefix;
+public interface Base {
+    /**
+     * @return String
+     */
+    public String command();
 }

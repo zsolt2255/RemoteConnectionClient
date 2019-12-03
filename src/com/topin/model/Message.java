@@ -5,6 +5,9 @@ import com.topin.model.contracts.MessageContract;
 abstract public class Message implements MessageContract {
     private String type;
 
+    /**
+     * @param type
+     */
     public Message(String type) {
         this.type = type;
     }

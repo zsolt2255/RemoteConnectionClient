@@ -1,34 +1,37 @@
 package com.topin.services;
 
+import com.topin.helpers.Log;
 import com.topin.socket.Send;
-import com.topin.utils.SocketProperties;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class ServerMessageSender implements Runnable {
     private Socket socket;
     private BufferedOutputStream bufferedOutputStream;
-    private BufferedInputStream bufferedInputStream;
 
+    /**
+     * @param socket
+     * @throws IOException
+     */
     public ServerMessageSender(Socket socket) throws IOException {
         this.socket = socket;
         this.bufferedOutputStream = new BufferedOutputStream(this.socket.getOutputStream());
-        this.bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
     }
 
     @Override
     public void run() {
         try {
-            this.startMessage(bufferedOutputStream);
+            //Send start messages to the Center
+            this.startMessages(this.bufferedOutputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Scanner scanner = new Scanner(System.in);
+        //Send command with scanner to Center
+
+        /*Scanner scanner = new Scanner(System.in);
         String input;
 
         try {
@@ -44,16 +47,22 @@ public class ServerMessageSender implements Runnable {
             } catch(Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
-    private void startMessage(BufferedOutputStream bufferedOutputStream) throws IOException {
+    /**
+     * @param bufferedOutputStream
+     * @throws IOException
+     */
+    private void startMessages(BufferedOutputStream bufferedOutputStream) throws IOException {
         new ServerDefaultMessageSender().getAllCommand().forEach((command) ->
         {
             try {
-                String result = Send.message(bufferedOutputStream, command);
-                System.out.println(result);
+                Send.message(bufferedOutputStream, command);
+
+                Log.write(this).info("ServerMessageSender successfully fetched"+command);
             } catch (IOException e) {
+                Log.write(this).error(e.getMessage());
                 e.printStackTrace();
             }
         });

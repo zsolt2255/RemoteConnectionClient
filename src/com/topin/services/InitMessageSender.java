@@ -4,8 +4,8 @@ import com.topin.actions.BackgroundImage;
 import com.topin.actions.BiosVersion;
 import com.topin.actions.PowerShell;
 import com.topin.actions.StaticCommand;
+import com.topin.helpers.Log;
 import com.topin.model.command.InitMessage;
-import com.topin.model.command.help.DriveUsageMessage;
 import com.topin.socket.Send;
 import com.topin.utils.SystemInfo;
 import org.apache.commons.io.FileUtils;
@@ -14,67 +14,55 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.*;
+import java.util.Base64;
+import java.util.Objects;
 
 import static com.topin.utils.SystemInfo.getProcessCpuLoad;
 
 public class InitMessageSender implements Runnable {
-    InitMessage initMessage;
+    private InitMessage initMessage;
     private BufferedOutputStream bufferedOutputStream;
 
-    public InitMessageSender() {
-        this.initMessage = null;
-    }
-
+    /**
+     * @param bufferedOutputStream
+     */
     public InitMessageSender(BufferedOutputStream bufferedOutputStream) {
         this.bufferedOutputStream = bufferedOutputStream;
     }
 
+    /**
+     * @return String
+     */
     private String taskList() {
         return String.valueOf(new TaskListListener().run());
     }
 
+    /**
+     * @return String
+     */
     public String driverUsageMessage() {
-        List<String> driveUsageMessages = new ArrayList<>();
-
-        File[] drives = File.listRoots();
-        if (drives != null && drives.length > 0) {
-            for (File aDrive : drives) {
-                System.out.println(aDrive.getName());
-                Long used = aDrive.getTotalSpace()-aDrive.getFreeSpace();
-                driveUsageMessages.add(new DriveUsageMessage(aDrive,used,aDrive.getTotalSpace()).toJson());
-            }
-        }
-
-        return String.valueOf(driveUsageMessages);
+        return new DriverUsageListener().run();
     }
 
     @Override
     public void run() {
         String backgroundImage = null;
         String biosVersion = null;
+        byte[] fileContent = new byte[0];
+
         try {
-            backgroundImage = RunCommand.execCmd(new PowerShell(new BackgroundImage().toString()).toString());
-            biosVersion = RunCommand.execCmd(new StaticCommand(new BiosVersion().toString()).toString()).split("[\\r\\n]+")[1];
+            backgroundImage = RunCommand.execCmd(new PowerShell(new BackgroundImage().command()).toString());
+            biosVersion = RunCommand.execCmd(new StaticCommand(new BiosVersion().command()).toString()).split("[\\r\\n]+")[1];
+            fileContent = FileUtils.readFileToByteArray(new File(Objects.requireNonNull(backgroundImage).trim()));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         String driverMessage = driverUsageMessage();
-
-        byte[] fileContent = new byte[0];
-
-        try {
-            fileContent = FileUtils.readFileToByteArray(new File(Objects.requireNonNull(backgroundImage).trim()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         String encodedString = Base64.getEncoder().encodeToString(fileContent);
-
         String biosVersionTrim = Objects.requireNonNull(biosVersion).trim();
-
         SystemInfo systemInfo = new SystemInfo();
+
         try {
             this.initMessage = new InitMessage(
                     InetAddress.getLocalHost().getHostName(),
@@ -99,7 +87,10 @@ public class InitMessageSender implements Runnable {
 
         try {
             Send.message(this.bufferedOutputStream, this.initMessage);
+
+            Log.write(this).info("InitMessageSender successfully fetched");
         } catch (IOException e) {
+            Log.write(this).error(e.getMessage());
             e.printStackTrace();
         }
     }

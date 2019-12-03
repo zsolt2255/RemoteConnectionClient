@@ -7,6 +7,10 @@ public class MouseClickMessage extends Message {
     private String button;
     private Integer mouseType;
 
+    /**
+     * @param button
+     * @param mouseType
+     */
     public MouseClickMessage(String button, Integer mouseType) {
         super("mouseClick");
         this.button = button;

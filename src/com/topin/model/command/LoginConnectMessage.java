@@ -7,6 +7,10 @@ public class LoginConnectMessage extends Message {
     private String username;
     private String password;
 
+    /**
+     * @param username
+     * @param password
+     */
     public LoginConnectMessage(String username, String password) {
         super("loginConnect");
         this.username = username;

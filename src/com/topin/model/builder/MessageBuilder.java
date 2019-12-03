@@ -10,11 +10,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MessageBuilder extends BuilderBase {
+    /**
+     * @param type
+     */
     public MessageBuilder(String type) {
         super(type);
     }
 
-
+    /**
+     * @return MessageContract
+     */
     public MessageContract get() {
         MessageContract messageBuilder;
         try {
@@ -36,6 +41,10 @@ public class MessageBuilder extends BuilderBase {
         return new UndefinedMessage("undefined");
     }
 
+    /**
+     * @param jsonData
+     * @return Message
+     */
     public static Message build(String jsonData) {
         try {
             JSONObject jsonObject = new JSONObject(jsonData);

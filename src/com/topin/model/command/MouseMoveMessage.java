@@ -7,6 +7,10 @@ public class MouseMoveMessage extends Message {
     private Integer x;
     private Integer y;
 
+    /**
+     * @param x
+     * @param y
+     */
     public MouseMoveMessage(Integer x, Integer y) {
         super("mouseMove");
         this.x = x;

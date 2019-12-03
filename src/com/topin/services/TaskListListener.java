@@ -1,7 +1,7 @@
 package com.topin.services;
 
+import com.topin.helpers.Log;
 import com.topin.model.command.help.ProcessSingle;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,24 +9,30 @@ import java.util.List;
 import java.util.Scanner;
 
 public class TaskListListener{
-    Process process;
-    List<String> taskLists = new ArrayList<>();
-    JSONObject jsonObject = new JSONObject();
+    private Process process;
+    private List<String> taskLists = new ArrayList<>();
 
     public TaskListListener() {
-        this.process = null;
         //this.taskLists.add(0, "count");
     }
 
+    /**
+     * @return List
+     */
     public List<String> run() {
         try {
             this.process = new ProcessBuilder("tasklist.exe", "/fo", "csv", "/nh").start();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         Scanner scanner = new Scanner(this.process.getInputStream());
         int count = 0;
-        if (scanner.hasNextLine()) scanner.nextLine();
+
+        if (scanner.hasNextLine()) {
+            scanner.nextLine();
+        }
+
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             String[] parts = line.split(",");
@@ -42,12 +48,17 @@ public class TaskListListener{
             taskLists.add(processSingle.toString());
             count++;
         }
+
         try {
             process.waitFor();
             //taskLists.set(0,"count:"+count);
         } catch (InterruptedException e) {
+            Log.write(this).error(e.getMessage());
             e.printStackTrace();
         }
+
+        Log.write(this).info("TaskListener successfully fetched"+taskLists);
+
         return taskLists;
     }
 }

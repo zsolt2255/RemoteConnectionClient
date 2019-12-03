@@ -8,6 +8,11 @@ public class CommandMessage extends Message {
     private String command;
     private String commandType;
 
+    /**
+     * @param id
+     * @param command
+     * @param commandType
+     */
     public CommandMessage(Integer id, String command, String commandType) {
         super("command");
         this.id = id;

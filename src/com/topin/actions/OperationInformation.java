@@ -1,10 +1,8 @@
 package com.topin.actions;
 
-public class OperationInformation extends Base {
-    private String prefix = "systeminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"";
-
+public class OperationInformation implements Base {
     @Override
-    public String toString() {
-        return this.prefix;
+    public String command() {
+        return "systeminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"";
     }
 }

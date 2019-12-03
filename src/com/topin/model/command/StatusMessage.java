@@ -7,6 +7,10 @@ public class StatusMessage extends Message {
     private boolean status;
     private String message;
 
+    /**
+     * @param status
+     * @param message
+     */
     public StatusMessage(boolean status, String message) {
         super("status");
         this.status = status;

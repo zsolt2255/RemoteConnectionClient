@@ -22,15 +22,31 @@ public enum SocketProperties {
         }
     }
 
+    /**
+     * @return String
+     */
     public String getSocketAddress() {
         return properties.getProperty("socket.address");
     }
 
-    public String getSocketPort() {
-        return properties.getProperty("socket.port");
+    /**
+     * @return Integer
+     */
+    public Integer getSocketPort() {
+        return Integer.valueOf(properties.getProperty("socket.port"));
     }
 
+    /**
+     * @return String
+     */
     public String getSocketExitCommand() {
         return properties.getProperty("socket.exitCommand");
+    }
+
+    /**
+     * @return String
+     */
+    public Integer getSocketTimeout() {
+        return Integer.valueOf(properties.getProperty("socket.timeout"));
     }
 }

@@ -12,6 +12,9 @@ import java.util.Base64;
 public class ImageCanvas extends Canvas {
     private BufferedImage bufferedImage;
 
+    /**
+     * @param stringBuffer
+     */
     public ImageCanvas(StringBuffer stringBuffer) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -43,19 +46,4 @@ public class ImageCanvas extends Canvas {
             g.drawImage(bufferedImage, x, y, this);
         }
     }
-
-            /*Canvas csStatusImage = new ImageCanvas(sb);
-        csStatusImage.setBounds(393, 36, 200, 200);
-        Frame frame = new Frame("Testing");
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-        frame.add(csStatusImage);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        frame.setBounds(110, 110, 1024, 768);*/
 }

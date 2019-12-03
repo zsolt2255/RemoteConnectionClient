@@ -6,9 +6,14 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class Listen {
-    private BufferedReader bufferedReader;
     private Socket socket;
+    private BufferedReader bufferedReader;
 
+    /**
+     * @param bufferedReader
+     * @param socket
+     * @throws IOException
+     */
     public Listen(BufferedReader bufferedReader, Socket socket) throws IOException {
         this.socket = socket;
         this.bufferedReader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));

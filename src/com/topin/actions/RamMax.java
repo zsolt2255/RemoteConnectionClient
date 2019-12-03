@@ -1,10 +1,8 @@
 package com.topin.actions;
 
-public class RamMax extends Base {
-    private String prefix = "systeminfo | findstr /C:\"Total Physical Memory\"";
-
+public class RamMax implements Base {
     @Override
-    public String toString() {
-        return this.prefix;
+    public String command() {
+        return "systeminfo | findstr /C:\"Total Physical Memory\"";
     }
 }

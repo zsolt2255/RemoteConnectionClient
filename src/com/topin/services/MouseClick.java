@@ -1,84 +1,119 @@
 package com.topin.services;
 
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class MouseClick implements MouseListener {
-    private String button; //left or right
-    private Integer mouseType; //0 = l click | 1 = bentt | 2 = felenged
-    private Robot robot = null;
+import static java.awt.event.InputEvent.BUTTON1_DOWN_MASK;
+import static java.awt.event.InputEvent.BUTTON3_DOWN_MASK;
 
+public class MouseClick implements MouseListener,Runnable {
+    private String button; //left or right
+    private Integer mouseType; //0 = l click | 1 = loop | 2 = release
+    private Robot robot = new Robot();
+
+    /**
+     * @param button
+     * @param mouseType
+     * @throws AWTException
+     */
     public MouseClick(String button, Integer mouseType) throws AWTException {
         this.button = button;
         this.mouseType = mouseType;
-        this.robot = new Robot();
     }
 
-    public void run() throws AWTException {
+    public void run() {
         switch (this.mouseType) {
             case 0:
-                oneClick(this.button);
+                oneClick();
                 break;
             case 1:
                 loopClick();
                 break;
             case 2:
-                down();
+                releaseClick();
                 break;
         }
     }
 
-    private void down() {
-        //
-    }
-
-    private void loopClick() {
-        //
-    }
-
-    private void oneClick(String button) {
+    /**
+     * @return void
+     */
+    private void releaseClick() {
         if (this.button.equals("left")) {
-            this.oneClickLeft();
+            this.releaseClickRun(BUTTON1_DOWN_MASK);
         } else if (this.button.equals("right")) {
-            this.oneClickRight();
+            this.releaseClickRun(BUTTON3_DOWN_MASK);
         }
     }
 
-    private void oneClickLeft() {
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+    /**
+     * @param button1DownMask
+     */
+    private void releaseClickRun(int button1DownMask) {
+        robot.mouseRelease(button1DownMask);
     }
 
-    private void oneClickRight() {
-        robot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+    /**
+     * @return void
+     */
+    private void loopClick() {
+        if (this.button.equals("left")) {
+            this.loopClickRun(BUTTON1_DOWN_MASK);
+        } else if (this.button.equals("right")) {
+            this.loopClickRun(BUTTON3_DOWN_MASK);
+        }
+    }
+
+    /**
+     * @param button1DownMask
+     */
+    private void loopClickRun(int button1DownMask) {
+        robot.mousePress(button1DownMask);
+    }
+
+    /**
+     * @return void
+     */
+    private void oneClick() {
+        if (this.button.equals("left")) {
+            this.oneClickRun(BUTTON1_DOWN_MASK);
+        } else if (this.button.equals("right")) {
+            this.oneClickRun(BUTTON3_DOWN_MASK);
+        }
+    }
+
+    /**
+     * @param button1DownMask
+     */
+    private void oneClickRun(int button1DownMask) {
+        robot.mousePress(button1DownMask);
+        robot.mouseRelease(button1DownMask);
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("mouseClicked");
+        //
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        System.out.println("mousePressed");
+        //
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("mouseReleased");
+        //
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        System.out.println("mouseEntered");
+        //
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        System.out.println("mouseExited");
+        //
     }
 }
 

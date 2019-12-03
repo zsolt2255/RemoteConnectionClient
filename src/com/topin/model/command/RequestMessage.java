@@ -8,6 +8,10 @@ public class RequestMessage extends Message {
     private String request;
     private String parameter; // json
 
+    /**
+     * @param request
+     * @param parameter
+     */
     public RequestMessage(String request, String parameter) {
         super("request");
         this.request = request;

@@ -10,6 +10,11 @@ public class DriveUsageMessage extends Message {
     private Long used;
     private Long all;
 
+    /**
+     * @param drive
+     * @param used
+     * @param all
+     */
     public DriveUsageMessage(File drive, Long used, Long all) {
         super("driverUsage");
         this.drive = drive;

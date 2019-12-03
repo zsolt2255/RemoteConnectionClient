@@ -1,5 +1,6 @@
 package com.topin.services;
 
+import com.topin.helpers.Log;
 import com.topin.model.command.LoginMessage;
 import com.topin.socket.Send;
 import org.json.JSONObject;
@@ -12,10 +13,13 @@ public class ServerListener implements Runnable {
     private Socket socket;
     private BufferedReader bufferedReader;
     private BufferedOutputStream bufferedOutputStream;
-    static String token;
-    static Boolean screenStatus = true;
-    Thread t1;
+    public static String token = null;
+    public static Boolean screenStatus = true;
 
+    /**
+     * @param socket
+     * @throws IOException
+     */
     public ServerListener(Socket socket) throws IOException {
         this.socket = socket;
         this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -26,18 +30,31 @@ public class ServerListener implements Runnable {
     public void run() {
         try {
             //Waiting for the LoginMessage
-            this.loginMessage(this.bufferedReader.readLine());
+            String loginCommand = null;
+            do {
+                loginCommand = this.bufferedReader.readLine();
+                this.loginMessage(loginCommand);
+            } while(loginCommand == null);
 
             //Send init message
             new Thread(new InitMessageSender(this.bufferedOutputStream)).start();
+
             while (true) {
                 String command = this.bufferedReader.readLine();
-                System.out.println("Listen Command: " + command);
 
-                this.checkCommand(command);
+                //Listen command from Center
+                Log.write("Listen").info("Listen command from Center: "+command);
+
+                if (command == null) {
+                    socket.close();
+                    break;
+                }
+
+                this.listenCommand(command);
             }
         } catch (IOException | AWTException e) {
-            System.out.println("Socket closed");
+            Log.write("Listen").info("Socket closed");
+            Log.write("Listen").error(e.getMessage());
             try {
                 socket.close();
             } catch (IOException e1) {
@@ -46,14 +63,19 @@ public class ServerListener implements Runnable {
         }
     }
 
-    private void checkCommand(String command) throws IOException, AWTException {
+    /**
+     * @param command
+     * @throws AWTException
+     */
+    private void listenCommand(String command) throws AWTException {
         String commandType = (String) (new JSONObject(command)).get("type");
+
         if (commandType.equals("request")) {
             String commandRequest = (String) (new JSONObject(command)).get("request");
+
             switch (commandRequest) {
                 case "init":
-                    System.out.println("run");
-                    new Thread(new InitMessageSender(this.bufferedOutputStream));
+                    new Thread(new InitMessageSender(this.bufferedOutputStream)).start();
                     break;
                 case "screenshot":
                     screenStatus = false;
@@ -67,27 +89,40 @@ public class ServerListener implements Runnable {
                     break;
             }
         }
-        if (commandType.equals("command")) {
-            new RunCommand((String) (new JSONObject(command)).get("command"));
-        }
-        if(commandType.equals("mouseMove")) {
-            new MouseMover((Integer) (new JSONObject(command)).get("x"),(Integer) (new JSONObject(command)).get("y")).run();
-        }
-        if(commandType.equals("mouseClick")) {
-            new MouseClick((String) (new JSONObject(command)).get("button"),(Integer) (new JSONObject(command)).get("mouseType")).run();
+        switch (commandType) {
+            case "command":
+                new Thread(new RunCommand((String) (new JSONObject(command)).get("command"))).start();
+                break;
+            case "mouseMove":
+                new Thread(new MouseMover((Integer) (new JSONObject(command)).get("x"),(Integer) (new JSONObject(command)).get("y"))).start();
+                break;
+            case "mouseClick":
+                new Thread(new MouseClick((String) (new JSONObject(command)).get("button"),(Integer) (new JSONObject(command)).get("mouseType"))).start();
+                break;
+            case "keyCode":
+                new Thread(new KeyCodeMessage((Integer) (new JSONObject(command)).get("keyCode"))).start();
+                break;
         }
     }
 
+    /**
+     * @return void
+     */
     private void screenShotLoop() {
-        System.out.println("megy");
         screenStatus = true;
-        this.t1 = new Thread(new ScreenCapture(this.bufferedOutputStream,"low"));
-        t1.start();
+        new Thread(new ScreenCapture(this.bufferedOutputStream,"low")).start();
     }
 
+    /**
+     * @param bufferedReader
+     * @throws IOException
+     */
     private void loginMessage(String bufferedReader) throws IOException {
-        token = (String)(new JSONObject(this.bufferedReader.readLine())).get("message");
+        token = (String) (new JSONObject(this.bufferedReader.readLine())).get("message");
         LoginMessage loginMessage = new LoginMessage("server",token);
+
         Send.message(this.bufferedOutputStream, loginMessage);
+
+        Log.write("Listen").info("ServerListener LoginMessage successfully fetched");
     }
 }

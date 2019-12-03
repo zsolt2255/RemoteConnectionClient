@@ -3,6 +3,9 @@ package com.topin.model.command;
 import com.topin.model.Message;
 
 public class UndefinedMessage extends Message {
+    /**
+     * @param type
+     */
     public UndefinedMessage(String type) {
         super(type);
     }

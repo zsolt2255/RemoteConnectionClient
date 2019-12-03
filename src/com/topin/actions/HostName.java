@@ -1,10 +1,8 @@
 package com.topin.actions;
 
-public class HostName extends Base {
-    private String prefix = "hostname";
-
+public class HostName implements Base {
     @Override
-    public String toString() {
-        return this.prefix;
+    public String command() {
+        return "hostname";
     }
 }

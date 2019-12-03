@@ -1,10 +1,8 @@
 package com.topin.actions;
 
-public class BiosVersion extends Base {
-    private String prefix = "wmic bios get smbiosbiosversion";
-
+public class BiosVersion implements Base {
     @Override
-    public String toString() {
-        return this.prefix;
+    public String command() {
+        return "wmic bios get smbiosbiosversion";
     }
 }

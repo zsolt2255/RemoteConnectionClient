@@ -7,6 +7,11 @@ public class ProcessSingle {
     private String name;
     private String memoryUsage;
 
+    /**
+     * @param pid
+     * @param name
+     * @param memoryUsage
+     */
     public ProcessSingle(String pid, String name, String memoryUsage) {
         this.pid = pid;
         this.name = name;
@@ -32,6 +37,7 @@ public class ProcessSingle {
         jsonObject.put("name",name);
         jsonObject.put("pid",pid);
         jsonObject.put("memUsage",memoryUsage);
+
         return String.valueOf(jsonObject);
     }
 }

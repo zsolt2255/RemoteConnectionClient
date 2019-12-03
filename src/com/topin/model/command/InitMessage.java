@@ -22,6 +22,21 @@ public class InitMessage extends Message {
 
     private String taskList; // JSON: {count: 121, [{name: 'Total Commander', status: 'idle', 'pid': 12331}]}
 
+    /**
+     * @param hostname
+     * @param cpuName
+     * @param localIp
+     * @param osName
+     * @param osVersion
+     * @param biosVersion
+     * @param cpuUsage
+     * @param ramMax
+     * @param ramUsage
+     * @param driveUsage
+     * @param taskList
+     * @param backgroundImage
+     * @param from
+     */
     public InitMessage(String hostname, String cpuName, String localIp, String osName, String osVersion, String biosVersion, Double cpuUsage, String ramMax, String ramUsage, String driveUsage, String taskList, String backgroundImage, String from) {
         super("init");
         this.hostname = hostname;
